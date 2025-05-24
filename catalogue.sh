@@ -86,7 +86,7 @@ VALIDATE $? "installing mongodb client"
 mongosh --host mongodb.meharsai.site </app/db/master-data.js
 VALIDATE $? "to load the masterdata products"
 
-mongosh --host mongodb.meharsai.sie
+mongosh --host mongodb.meharsai.site
 VALIDATE $? "to check whether the data is loaded or not "
 
 
