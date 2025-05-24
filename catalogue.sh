@@ -83,7 +83,7 @@ VALIDATE $? "mongodb.repo relading"
 dnf install mongodb-mongosh -y   &>>$LOG_FILE
 VALIDATE $? "installing mongodb client"
 
-STATUS=$(mongosh --host mongodb.daws84s.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
+STATUS=$(mongosh --host mongodb.meharsai.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
 if [ $STATUS -lt 0 ]
 then
     mongosh --host mongodb.meharsai.site </app/db/master-data.js &>>$LOG_FILE
