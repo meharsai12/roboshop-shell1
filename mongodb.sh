@@ -38,11 +38,11 @@ VALIDATE $? "Copying the mongodb repo"
 dnf install mongodb-org -y    &>>LOGS_FOLDER
 VALIDATE $? " Installing mongodb "
 
-systemctl enable mongod     &LOGS_FOLDER
+systemctl enable mongod     &>>LOGS_FOLDER
 VALIDATE $? "enable mongod"
 
 
-systemctl start mongod       &LOGS_FOLDER
+systemctl start mongod       &>>LOGS_FOLDER
 VALIDATE $? "start mongod" 
 
 
