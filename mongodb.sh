@@ -24,9 +24,9 @@ fi
 VALIDATE(){
     if [ $1 -eq 0 ]
     then
-        echo -e "  $Y $2  is success $N " | tee -a $LOG_FILE
+        echo -e "   $2....  is $G success $N " | tee -a $LOG_FILE
     else
-        echo -e " $Y $2  is failure $N " | tee -a $LOG_FILE
+        echo -e "  $2....   is $Y failure $N " | tee -a $LOG_FILE
         exit 1
     fi
 }
