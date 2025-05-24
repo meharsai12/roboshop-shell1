@@ -32,13 +32,13 @@ VALIDATE(){
 }
 
 
-dnf module disable nodejs -y
+dnf module disable nodejs -y  &>>$LOG_FILE
 VALIDATE $? " disabling the nodejs "
 
-dnf module enable nodejs:20 -y
+dnf module enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? " enable the nodejs:20 "
 
-dnf install nodejs -y
+dnf install nodejs -y  &>>$LOG_FILE
 VALIDATE $? " installing the nodejs"
 
 id roboshop
@@ -53,40 +53,41 @@ fi
 mkdir -p /app  #by adding -p , it created directory if no there , if there it dont create
 VALIDATE $? "creating app directory "
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
 VALIDATE $? "downloading catalogue zipfile "
 
 rm -rf /app/* #by adding this line if we run n number of times it wont stuck because if we alreadr run one time it asks again to say whether it is there so by giving this command it deletes the data present and unzip again 
 cd /app 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "unzipping the catalogue"
 
-npm install 
+npm install  &>>$LOG_FILE 
 VALIDATE $? "installing the dependicies "
 
-cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service  &>>$LOG_FILE
 VALIDATE $? "copying the catalogue.service files"
 
 
 systemctl daemon-reload
 VALIDATE $? "reloading the catalogue.service"
 
-systemctl enable catalogue 
+systemctl enable catalogue  &>>$LOG_FILE
 VALIDATE $? "enabling catalogue"
 
-systemctl start catalogue
+systemctl start catalogue   &>>$LOG_FILE
 VALIDATE $? "starting catalogue"
 
-cp $SCRIPT_DIR/mongodb.repo /etc/yum.repos.d/mongo.repo
+cp $SCRIPT_DIR/mongodb.repo /etc/yum.repos.d/mongo.repo  &>>$LOG_FILE
 VALIDATE $? "mongodb.repo relading"
 
-dnf install mongodb-mongosh -y
+dnf install mongodb-mongosh -y   &>>$LOG_FILE
 VALIDATE $? "installing mongodb client"
 
-mongosh --host mongodb.meharsai.site </app/db/master-data.js
-VALIDATE $? "to load the masterdata products"
-
-mongosh --host mongodb.meharsai.site
-VALIDATE $? "to check whether the data is loaded or not "
-
-
+STATUS=$(mongosh --host mongodb.daws84s.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
+if [ $STATUS -lt 0 ]
+then
+    mongosh --host mongodb.meharsai.site </app/db/master-data.js &>>$LOG_FILE
+    VALIDATE $? "Loading data into MongoDB"
+else
+    echo -e "Data is already loaded ... $Y SKIPPING $N"
+fi
