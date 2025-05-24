@@ -5,7 +5,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
-LOGS_FOLDER="/var/log/shellscript-logs"
+LOGS_FOLDER="/var/log/roboshop-logs"
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 PACKAGES=("mysql" "python" "nginx" "httpd")
@@ -35,14 +35,14 @@ VALIDATE(){
 cp mongodb.repo /etc/yum.repos.d/mongo.repo
 VALIDATE $? "Copying the mongodb repo"
 
-dnf install mongodb-org -y 
+dnf install mongodb-org -y    &>>LOGS_FOLDER
 VALIDATE $? " Installing mongodb "
 
-systemctl enable mongod 
+systemctl enable mongod     &LOGS_FOLDER
 VALIDATE $? "enable mongod"
 
 
-systemctl start mongod
+systemctl start mongod       &LOGS_FOLDER
 VALIDATE $? "start mongod" 
 
 
