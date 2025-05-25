@@ -67,5 +67,4 @@ cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
 VALIDATE $? "nginxconfigurations "
 
 systemctl restart nginx 
-VALIDATE $? "restarting nginx"
-
+VALIDATE $? "restarting nginx is "
