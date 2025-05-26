@@ -1,5 +1,6 @@
 #!/bin/bash
 
+START_TIME=$(date +%s)
 USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
@@ -68,3 +69,7 @@ VALIDATE $? "nginxconfigurations "
 
 systemctl restart nginx 
 VALIDATE $? "restarting nginx is "
+
+END_TIME=$(date +%s)
+TOTAL_TIME=$(( $START_TIME - $END_TIME ))
+echo -e " Time taken to execute script is :: $Y $TOTAL_TIME in seconds $N "
