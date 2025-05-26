@@ -46,7 +46,7 @@ systemctl start mongod       &>>LOGS_FOLDER
 VALIDATE $? "start mongod" 
 
 
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf   # we will be sed editor to replacing the content and -i is for premanent edit or replacing content
 VALIDATE $?  " replacin ip address for remote connections"
 
 systemctl restart mongod
