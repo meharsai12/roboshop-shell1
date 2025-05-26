@@ -1,6 +1,5 @@
 #!/bin/bash
 
-START_TIME=$(date +%s)
 USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
@@ -9,6 +8,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/roboshop-logs"
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
+SCRIPT_DIR=$PWD
 
 mkdir -p $LOGS_FOLDER
 echo "Script started executing at: $(date)" | tee -a $LOG_FILE
@@ -43,7 +43,7 @@ dnf install nginx -y &>>$LOG_FILE
 VALIDATE $? "Installing Nginx"
 
 systemctl enable nginx  &>>$LOG_FILE
-systemctl start nginx  &>>$LOG_FILE
+systemctl start nginx 
 VALIDATE $? "Starting Nginx"
 
 rm -rf /usr/share/nginx/html/* &>>$LOG_FILE
@@ -59,8 +59,9 @@ VALIDATE $? "unzipping frontend"
 rm -rf /etc/nginx/nginx.conf &>>$LOG_FILE
 VALIDATE $? "Remove default nginx conf"
 
-cp $SCRIPT_DIR/nginx.config /etc/nginx/nginx.conf  &>>$LOG_FILE
+cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
 VALIDATE $? "Copying nginx.conf"
 
 systemctl restart nginx 
 VALIDATE $? "Restarting nginx"
+
