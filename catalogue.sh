@@ -50,10 +50,11 @@ then
 else
  echo -e  "Systemuser is already created... $Y SKIPPING $N "
  exit 1
-fi 
 
-mkdir -p /app
-VALIDATE $? "Creating directory"
+fi
+
+mkdir -p /app 
+VALIDATE $? "Creating app directory"
 
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
