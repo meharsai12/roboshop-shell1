@@ -1,6 +1,5 @@
 #!/bin/bash
 
-START_TIME=$(date +%s)
 USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
@@ -34,60 +33,49 @@ VALIDATE(){
     fi
 }
 
-dnf module disable nodejs -y
-VALIDATE $? "disable nodejs"
+dnf module disable nodejs -y &>>$LOG_FILE
+VALIDATE $? "Disabling default nodejs"
 
-dnf module enable nodejs:20 -y
-VALIDATE $? "enable nodejs"
+dnf module enable nodejs:20 -y &>>$LOG_FILE
+VALIDATE $? "Enabling nodejs:20"
 
-dnf install nodejs -y
-VALIDATE $? "install nodejs"
+dnf install nodejs -y &>>$LOG_FILE
+VALIDATE $? "Installing nodejs:20"
 
 id roboshop
 if [ $? -ne 0 ]
 then
-   useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
-   VALIDATE $? "systemuser is created"
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+    VALIDATE $? "Creating roboshop system user"
 else
- echo -e  "Systemuser is already created... $Y SKIPPING $N "
- exit 1
-
+    echo -e "System user roboshop already created ... $Y SKIPPING $N"
 fi
 
 mkdir -p /app 
 VALIDATE $? "Creating app directory"
 
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
+VALIDATE $? "Downloading Catalogue"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
-VALIDATE $? "download catalogue zipfile"
-
-
-rm -rf /app/* &>>$LOG_FILE
+rm -rf /app/*
 cd /app 
 unzip /tmp/catalogue.zip &>>$LOG_FILE
-VALIDATE $? "unzip catalogue"
+VALIDATE $? "unzipping catalogue"
 
 npm install &>>$LOG_FILE
-VALIDATE $? "install catalogue"
-
+VALIDATE $? "Installing Dependencies"
 
 cp $SCRIPT_DIR/catalogue.ser /etc/systemd/system/catalogue.service
-VALIDATE $? "copying catalogue services "
+VALIDATE $? "Copying catalogue service"
 
 systemctl daemon-reload &>>$LOG_FILE
-VALIDATE $? "daemon reload catalogue"
-
 systemctl enable catalogue  &>>$LOG_FILE
-VALIDATE "enable catalogue"
+systemctl start catalogue
+VALIDATE $? "Starting Catalogue"
 
-systemctl start catalogue &>>$LOG_FILE
-VALIDATE $? "start catalogue"
-
-cp $SCRIPT_DIR/mongodb.repo /etc/yum.repos.d/mongo.repo
-VALIDATE $? " install mongodb client "
-
+cp $SCRIPT_DIR/mongodb.repo /etc/yum.repos.d/mongo.repo 
 dnf install mongodb-mongosh -y &>>$LOG_FILE
-VALIDATE $? "install mongodb-mongosh"
+VALIDATE $? "Installing MongoDB Client"
 
 STATUS=$(mongosh --host mongodb.meharsai.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
 if [ $STATUS -lt 0 ]
@@ -97,9 +85,4 @@ then
 else
     echo -e "Data is already loaded ... $Y SKIPPING $N"
 fi
-
-END_TIME=$(date +%s)
-TOTAL_TIME= $(( $START_TIME - $END_TIME ))
-echo -e " Script executed in $Y ..seconds $N "
-
 
