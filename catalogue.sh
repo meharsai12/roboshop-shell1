@@ -77,10 +77,10 @@ cp $SCRIPT_DIR/mongodb.repo /etc/yum.repos.d/mongo.repo
 dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "Installing MongoDB Client"
 
-STATUS=$(mongosh --host mongodb.meharsai.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
+STATUS=$(mongosh --host 172.31.44.186 --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
 if [ $STATUS -lt 0 ]
 then
-    mongosh --host mongodb.meharsai.site </app/db/master-data.js &>>$LOG_FILE
+    mongosh --host 172.31.44.186 </app/db/master-data.js &>>$LOG_FILE
     VALIDATE $? "Loading data into MongoDB"
 else
     echo -e "Data is already loaded ... $Y SKIPPING $N"
