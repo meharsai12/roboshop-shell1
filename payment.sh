@@ -1,5 +1,6 @@
 #!/bin/bash
 
+START_TIME=$(date +%s)
 USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
@@ -22,9 +23,6 @@ else
     echo "You are running with root access" | tee -a $LOG_FILE
 fi
 
-
-
-
 # validate functions takes input as exit status, what command they tried to install
 VALIDATE(){
     if [ $1 -eq 0 ]
@@ -36,10 +34,10 @@ VALIDATE(){
     fi
 }
 
-dnf install python3 gcc python3-devel -y
-VALIDATE $? "install python3"
+dnf install python3 gcc python3-devel -y &>>$LOG_FILE
+VALIDATE $? "Install Python3 packages"
 
-id roboshop
+id roboshop &>>$LOG_FILE
 if [ $? -ne 0 ]
 then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
@@ -53,7 +51,6 @@ VALIDATE $? "Creating app directory"
 
 curl -o /tmp/payment.zip https://roboshop-artifacts.s3.amazonaws.com/payment-v3.zip &>>$LOG_FILE
 VALIDATE $? "Downloading payment"
-
 
 rm -rf /app/*
 cd /app 
@@ -74,3 +71,8 @@ VALIDATE $? "Enable payment"
 
 systemctl start payment &>>$LOG_FILE
 VALIDATE $? "Starting payment"
+
+END_TIME=$(date +%s)
+TOTAL_TIME=$(( $END_TIME - $START_TIME ))
+
+echo -e "Script exection completed successfully, $Y time taken: $TOTAL_TIME seconds $N" | tee -a $LOG_FILE
